@@ -1,13 +1,9 @@
 import os, sys, argparse
 import snowflake.connector
 import pandas as pd
-
-__file__ = "analyze-table.py"
+from snowflake_tools import snowflake_config
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(project_dir)
-# from lib.helpers import Timer
-from snowflake_tools import snowflake_config
 
 
 def dump(obj):
@@ -69,7 +65,9 @@ class Snowflake:
 
 def cli():
 
-    parser = argparse.ArgumentParser(description="Get SQL to mirror permissions from another table.")
+    parser = argparse.ArgumentParser(
+        description="Get SQL to mirror permissions from another table."
+    )
 
     parser.add_argument(
         "--profile",
@@ -102,6 +100,7 @@ def cli():
     )
 
     # poetry run permissions --profile bd --source-db BD_DEV_PRD --source-grantee DATA_ENGINEERING --target-db ARCHTICS --target-grantee DATA_ENGINEERING
+    # snowflake-mirror-permissions --profile bd --source-db BD_DEV_PRD --source-grantee DATA_ENGINEERING --target-db ARCHTICS --target-grantee DATA_ENGINEERING
 
     args = parser.parse_args()
     # args = parser.parse_args(
