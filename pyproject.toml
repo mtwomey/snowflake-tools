@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "snowflake-tools"
+version = "0.1.0"
+description = ""
+authors = ["mtwomey <mtwomey@beakstar.com>"]
+readme = "README.md"
+packages = [{include = "snowflake_tools", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+snowflake-mirror-permissions = "snowflake_tools.mirror_permissions:cli"
