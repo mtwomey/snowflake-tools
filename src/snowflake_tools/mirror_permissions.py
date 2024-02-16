@@ -68,7 +68,8 @@ class Snowflake:
 def cli():
 
     parser = argparse.ArgumentParser(
-        description=f"Get SQL to mirror permissions from another table v{version}."
+        description=f"Get SQL to mirror permissions from another table v{version}.",
+        epilog="Example: snowflake-mirror-permissions --profile bd --source-db BD_DEV_PRD --source-grantee DATA_ENGINEERING --target-db ARCHTICS --target-grantee DATA_ENGINEERING",
     )
 
     parser.add_argument(
@@ -100,9 +101,6 @@ def cli():
         help="Target grantee.",
         required=True,
     )
-
-    # poetry run permissions --profile bd --source-db BD_DEV_PRD --source-grantee DATA_ENGINEERING --target-db ARCHTICS --target-grantee DATA_ENGINEERING
-    # snowflake-mirror-permissions --profile bd --source-db BD_DEV_PRD --source-grantee DATA_ENGINEERING --target-db ARCHTICS --target-grantee DATA_ENGINEERING
 
     args = parser.parse_args()
     # args = parser.parse_args(

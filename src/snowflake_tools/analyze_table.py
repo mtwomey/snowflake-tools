@@ -140,7 +140,10 @@ class Table:
 
 
 def cli():
-    parser = argparse.ArgumentParser(description=f"Analyze Snowflake Table v{version}.")
+    parser = argparse.ArgumentParser(
+        description=f"Analyze Snowflake Table v{version}.",
+        epilog="Example: snowflake-analyze-table --profile bd --table FIVETRAN_DATABASE.MYSQL_LOTTERY_PROD.NLDLS_DLSLOT_ENTRIES",
+    )
 
     parser.add_argument(
         "--profile",
@@ -155,7 +158,6 @@ def cli():
     args = parser.parse_args()
 
     # args = parser.parse_args(['BD_DEV_PRD.MTWOMEY.STG_LT__ENTRIES_CURRENT'])
-    # snowflake-analyze-table --profile bd --table FIVETRAN_DATABASE.MYSQL_LOTTERY_PROD.NLDLS_DLSLOT_ENTRIES
 
     if args.table is None:
         parser.print_help()
