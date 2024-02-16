@@ -74,31 +74,31 @@ def cli():
 
     parser.add_argument(
         "--profile",
-        help="Profile name.",
+        help="Profile name",
         required=True,
     )
 
     parser.add_argument(
         "--source-db",
-        help="Source database.",
+        help="Source database",
         required=True,
     )
 
     parser.add_argument(
         "--source-grantee",
-        help="Source grantee.",
+        help="Source grantee",
         required=True,
     )
 
     parser.add_argument(
         "--target-db",
-        help="Target database.",
+        help="Target database",
         required=True,
     )
 
     parser.add_argument(
         "--target-grantee",
-        help="Target grantee.",
+        help="Target grantee",
         required=True,
     )
 

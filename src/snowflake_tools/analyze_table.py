@@ -147,12 +147,12 @@ def cli():
 
     parser.add_argument(
         "--profile",
-        help="Profile name.",
+        help="Profile name",
         required=True,
     )
 
     parser.add_argument(
-        "--table", help="Fully qualified table or view name.", required=True
+        "--table", help="Fully qualified table or view name", required=True
     )
 
     args = parser.parse_args()
