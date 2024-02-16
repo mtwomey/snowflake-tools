@@ -8,6 +8,8 @@ packages = [{include = "snowflake_tools", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+snowflake-connector-python = {extras = ["pandas"], version = "^3.7.0"}
+toml = "^0.10.2"
 
 [build-system]
 requires = ["poetry-core"]
