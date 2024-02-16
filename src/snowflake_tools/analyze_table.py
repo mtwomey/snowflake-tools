@@ -5,7 +5,7 @@ from snowflake_tools import Timer
 import pkg_resources
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-version = pkg_resources.get_distribution('snowflake-tools').version
+version = pkg_resources.get_distribution("snowflake-tools").version
 
 
 def dump(obj):

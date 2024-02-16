@@ -2,8 +2,10 @@ import os, sys, argparse
 import snowflake.connector
 import pandas as pd
 from snowflake_tools import snowflake_config
+import pkg_resources
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+version = pkg_resources.get_distribution("snowflake-tools").version
 
 
 def dump(obj):
@@ -66,7 +68,7 @@ class Snowflake:
 def cli():
 
     parser = argparse.ArgumentParser(
-        description="Get SQL to mirror permissions from another table."
+        description=f"Get SQL to mirror permissions from another table v{version}."
     )
 
     parser.add_argument(
