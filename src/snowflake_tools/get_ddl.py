@@ -1,14 +1,9 @@
-import os, sys, argparse
-import snowflake.connector
-import pandas as pd
+import os, argparse
 from snowflake_tools import snowflake_config
 from snowflake_tools.Snowflake import Snowflake
-
-# import pkg_resources
 from importlib.metadata import version
 
 project_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-# version = pkg_resources.get_distribution("snowflake-tools").version
 snowflake_tools_version = version("snowflake-tools")
 
 
@@ -43,20 +38,6 @@ def cli():
     )
 
     args = parser.parse_args()
-    # args = parser.parse_args(
-    #     [
-    #         "--profile",
-    #         "bd",
-    #         "--source-db",
-    #         "BD_DEV_PRD",
-    #         "--source-grantee",
-    #         "DATA_ENGINEERING",
-    #         "--target-db",
-    #         "ARCHTICS",
-    #         "--target-grantee",
-    #         "DATA_ENGINEERING",
-    #     ]
-    # )
 
     if args.profile is None:
         parser.print_help()
@@ -72,6 +53,6 @@ def cli():
                 debug=True,
             )
 
-            print(snowflake.get_ddl(args.type , args.name))
+            print(snowflake.get_ddl(args.type, args.name))
         except Exception as e:
             print(e)
