@@ -13,7 +13,7 @@ def dump(obj):
         print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
 
-class Table:
+class SnowflakeTable:
     def __init__(self, table_name, connection_config, max_distinct=8, debug=False):
         self.table_name = table_name
         self.max_distinct = max_distinct
@@ -45,14 +45,15 @@ class Table:
             0
         ]
 
+        if debug == True:
+            print(f"Max distinct values: {max_distinct}")
+
+    def analyze(self):
         self._add_has_null()
         self._add_has_empty_strings()
         self._add_has_zeros()
         self._add_distinct_count()
         self._add_values()
-
-        if debug == True:
-            print(f"Max distinct values: {max_distinct}")
 
     def _add_has_null(self):
         if self.debug == True:
@@ -173,7 +174,7 @@ def cli():
             )
             exit()
 
-        t1 = Table(
+        table = SnowflakeTable(
             SNOWFLAKE_TABLE,
             {
                 "user": config["user"],
@@ -185,9 +186,11 @@ def cli():
             debug=True,
         )
 
-        print(f"\nTotal rows: {t1.total_rows:,}\n")
+        table.analyze()
+
+        print(f"\nTotal rows: {table.total_rows:,}\n")
         print(
-            t1.column_info[
+            table.column_info[
                 [
                     "COLUMN_NAME",
                     "DATA_TYPE",
