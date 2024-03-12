@@ -22,3 +22,4 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.scripts]
 snowflake-mirror-permissions = "snowflake_tools.mirror_permissions:cli"
 snowflake-analyze-table = "snowflake_tools.analyze_table:cli"
+snowflake-get-ddl = "snowflake_tools.get_ddl:cli"
