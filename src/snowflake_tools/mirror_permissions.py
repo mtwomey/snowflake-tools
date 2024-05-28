@@ -20,6 +20,7 @@ class Snowflake:
             user=connection_config["user"],
             password=connection_config["password"],
             account=connection_config["account"],
+            role=connection_config["role"],
         )
         self.cursor = self.connection.cursor()
 
@@ -128,6 +129,7 @@ def cli():
                     "user": config["user"],
                     "password": config["password"],
                     "account": config["account"],
+                    "role": config["role"],
                 },
                 debug=True,
             )

@@ -1,4 +1,4 @@
-import os, sys, argparse
+import os, argparse
 import snowflake.connector
 from snowflake_tools import snowflake_config
 from snowflake_tools import Timer
@@ -14,33 +14,36 @@ def dump(obj):
 
 
 class SnowflakeTable:
-    def __init__(self, table_name, connection_config, max_distinct=8, debug=False):
-        self.table_name = table_name
+    def __init__(self, fq_table, connection_config, max_distinct=8, debug=False):
+        (self.snowflake_database, self.snowflake_schema, self.snowflake_table) = (
+            fq_table.split(".")
+        )
         self.max_distinct = max_distinct
         self.connection_config = connection_config
         self.connection = snowflake.connector.connect(
             user=connection_config["user"],
             password=connection_config["password"],
             account=connection_config["account"],
-            database=connection_config["database"],
-            schema=connection_config["schema"],
+            database=self.snowflake_database,
+            schema=self.snowflake_schema,
+            role=connection_config["role"],
         )
         self.cursor = self.connection.cursor()
         self.cursor.execute(
-            rf"""select * from {connection_config['database']}.INFORMATION_SCHEMA.COLUMNS
-            where table_schema = '{connection_config['schema']}'
-            and table_name = '{table_name}'"""
+            rf"""select * from {self.snowflake_database}.INFORMATION_SCHEMA.COLUMNS
+            where table_schema = '{self.snowflake_schema}'
+            and table_name = '{self.snowflake_table}'"""
         )
         self.column_info = self.cursor.fetch_pandas_all()
         if len(self.column_info) == 0:
             print(
-                f'Could not find information on table or view: {connection_config["database"]}.{connection_config["schema"]}.{table_name}'
+                f"Could not find information on table or view: {self.snowflake_database}.{self.snowflake_schema}.{self.snowflake_table}"
             )
             exit()
         self.debug = debug
 
         self.total_rows = self.cursor.execute(
-            f"""select count(1) from {connection_config['database']}.{connection_config['schema']}.{self.table_name}"""
+            f"""select count(1) from {fq_table}"""
         ).fetchone()[  # type: ignore
             0
         ]
@@ -62,7 +65,7 @@ class SnowflakeTable:
         with Timer(output=self.debug):
             for index, row in self.column_info.iterrows():
                 result = self.cursor.execute(
-                    f"""select count(1) from {self.connection_config['database']}.{self.connection_config['schema']}.{self.table_name} where {row["COLUMN_NAME"]} is null"""
+                    f"""select count(1) from {self.snowflake_database}.{self.snowflake_schema}.{self.snowflake_table} where {row["COLUMN_NAME"]} is null"""
                 )
                 null_count = result.fetchone()[0]  # type: ignore
 
@@ -78,7 +81,7 @@ class SnowflakeTable:
             for index, row in self.column_info.iterrows():
                 if row["DATA_TYPE"] == "TEXT":
                     result = self.cursor.execute(
-                        f"""select count(1) from {self.connection_config['database']}.{self.connection_config['schema']}.{self.table_name} where {row["COLUMN_NAME"]} = ''"""
+                        f"""select count(1) from {self.snowflake_database}.{self.snowflake_schema}.{self.snowflake_table} where {row["COLUMN_NAME"]} = ''"""
                     )
                     empty_strings_count = result.fetchone()[0]  # type: ignore
                     if empty_strings_count > 0:
@@ -95,7 +98,7 @@ class SnowflakeTable:
             for index, row in self.column_info.iterrows():
                 if row["DATA_TYPE"] == "NUMBER":
                     result = self.cursor.execute(
-                        f"""select count(1) from {self.connection_config['database']}.{self.connection_config['schema']}.{self.table_name} where {row["COLUMN_NAME"]} = 0"""
+                        f"""select count(1) from {self.snowflake_database}.{self.snowflake_schema}.{self.snowflake_table} where {row["COLUMN_NAME"]} = 0"""
                     )
                     zeros_count = result.fetchone()[0]  # type: ignore
 
@@ -112,7 +115,7 @@ class SnowflakeTable:
         with Timer(output=self.debug):
             for index, row in self.column_info.iterrows():
                 result = self.cursor.execute(
-                    f"""select count(distinct({row["COLUMN_NAME"]})) from {self.connection_config['database']}.{self.connection_config['schema']}.{self.table_name}"""
+                    f"""select count(distinct({row["COLUMN_NAME"]})) from {self.snowflake_database}.{self.snowflake_schema}.{self.snowflake_table}"""
                 )
                 distinct_count = result.fetchone()[0]  # type: ignore
 
@@ -129,7 +132,7 @@ class SnowflakeTable:
                 if distinct_count <= self.max_distinct:
 
                     result = self.cursor.execute(
-                        f"""select listagg(distinct({row["COLUMN_NAME"]}), ', ') from {self.connection_config['database']}.{self.connection_config['schema']}.{self.table_name}"""
+                        f"""select listagg(distinct({row["COLUMN_NAME"]}), ', ') from {self.snowflake_database}.{self.snowflake_schema}.{self.snowflake_table}"""
                     )
                     values = result.fetchone()[0]  # type: ignore
 
@@ -165,9 +168,6 @@ def cli():
     else:
         try:
             config = snowflake_config.get_profile(args.profile)
-            (SNOWFLAKE_DATABASE, SNOWFLAKE_SCHEMA, SNOWFLAKE_TABLE) = args.table.split(
-                "."
-            )
         except ValueError:
             print(
                 "Error: Please provide a fully qualified table or view name: DATABASE.SCHEMA.TABLE"
@@ -175,13 +175,13 @@ def cli():
             exit()
 
         table = SnowflakeTable(
-            SNOWFLAKE_TABLE,
+            # SNOWFLAKE_TABLE,
+            args.table,
             {
                 "user": config["user"],
                 "password": config["password"],
                 "account": config["account"],
-                "database": SNOWFLAKE_DATABASE,
-                "schema": SNOWFLAKE_SCHEMA,
+                "role": config["role"],
             },
             debug=True,
         )
