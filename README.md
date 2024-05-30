@@ -1,7 +1,7 @@
 # Install
 
 ```
-pip install git+ssh://git@github.com/mtwomey/snowflake-tools@v0.1.2
+pip install git+ssh://git@github.com/mtwomey/snowflake-tools@v0.1.3
 ```
 
 # Making sure the version on Github is good
