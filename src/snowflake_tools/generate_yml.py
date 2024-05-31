@@ -13,8 +13,12 @@ def dump(obj):
     for attr in dir(obj):
         print("obj.%s = %r" % (attr, getattr(obj, attr)))
 
+
 def is_mixed_case(input_str):
-    return any(char.isupper() for char in input_str) and any(char.islower() for char in input_str)
+    return any(char.isupper() for char in input_str) and any(
+        char.islower() for char in input_str
+    )
+
 
 def cli():
     parser = argparse.ArgumentParser(
@@ -60,26 +64,6 @@ def cli():
 
         table.analyze()
 
-        # dump(table.column_info[["DATA_TYPE"]])
-
-        # print(f"\nTotal rows: {table.total_rows:,}\n")
-        # print(
-        #     table.column_info[
-        #         [
-        #             # "COLUMN_NAME",
-        #             "DATA_TYPE",
-        #             # "NULLS",
-        #             # "EMPTY_STRINGS",
-        #             # "ZEROS",
-        #             # "DIST",
-        #             # "UNIQUE",
-        #             # "VALUES",
-        #         ]
-        #     ]
-        #     # .sort_values(by="COLUMN_NAME")
-        #     .to_markdown(index=False, tablefmt="simple")
-        # )
-
         def str_presenter(dumper, data):
             if data.count("\n") > 0:
                 data = "\n".join(
@@ -108,7 +92,7 @@ def cli():
 
             if row.UNIQUE:
                 description_line.append("* Column has Unique values")
-                tests.append('unique')
+                tests.append("unique")
 
             if row.NULLS:
                 description_line.append("* Column has NULL values")
@@ -133,14 +117,13 @@ def cli():
             columns = dict["models"][0]["columns"]
             columns.append(
                 {
-                    "name": f'"{row.COLUMN_NAME}"' if is_mixed_case(row.COLUMN_NAME) else row.COLUMN_NAME.lower(),
+                    "name": (
+                        f'"{row.COLUMN_NAME}"'
+                        if is_mixed_case(row.COLUMN_NAME)
+                        else row.COLUMN_NAME.lower()
+                    ),
                     "description": "\n".join(description_line),
                     "tests": tests,
                 }
             )
-            # dict[models][0]["columns": []]
-            # print(row.DATA_TYPE)
-
-        # print(dict["models"][0]["columns"])
         print(yaml.dump(dict, Dumper=MyDumper, sort_keys=False))
-        # print(dict)
