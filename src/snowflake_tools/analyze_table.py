@@ -52,6 +52,8 @@ def cli():
                 "password": config["password"],
                 "account": config["account"],
                 "role": config["role"],
+                "private_key_path": config["private_key_path"],
+                "warehouse": config["warehouse"],
             },
             debug=True,
         )

@@ -1,5 +1,10 @@
 import snowflake.connector
+import os
 from snowflake_tools import Timer
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.asymmetric import dsa
+from cryptography.hazmat.primitives import serialization
 
 
 class SnowflakeTable:
@@ -9,14 +14,40 @@ class SnowflakeTable:
         )
         self.max_distinct = max_distinct
         self.connection_config = connection_config
-        self.connection = snowflake.connector.connect(
-            user=connection_config["user"],
-            password=connection_config["password"],
-            account=connection_config["account"],
-            database=self.snowflake_database,
-            schema=self.snowflake_schema,
-            role=connection_config["role"],
-        )
+
+        if connection_config["private_key_path"]:
+            with open(connection_config["private_key_path"], "rb") as key:
+                p_key = serialization.load_pem_private_key(
+                    key.read(),
+                    password=None,
+                    backend=default_backend(),
+                )
+            pkb = p_key.private_bytes(
+                encoding=serialization.Encoding.DER,
+                format=serialization.PrivateFormat.PKCS8,
+                encryption_algorithm=serialization.NoEncryption(),
+            )
+            self.connection = snowflake.connector.connect(
+                user=connection_config["user"],
+                account=connection_config["account"],
+                private_key=pkb,
+                database=self.snowflake_database,
+                schema=self.snowflake_schema,
+                role=connection_config["role"],
+                warehouse=connection_config["warehouse"],
+            )
+
+        else:
+            self.connection = snowflake.connector.connect(
+                user=connection_config["user"],
+                password=connection_config["password"],
+                account=connection_config["account"],
+                database=self.snowflake_database,
+                schema=self.snowflake_schema,
+                role=connection_config["role"],
+                warehouse=connection_config["warehouse"],
+            )
+
         self.cursor = self.connection.cursor()
         self.debug = debug
 
